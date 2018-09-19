@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from random import choice
+from time import sleep
 
 URL = "http://quotes.toscrape.com"
 ALL_QUOTES = []
@@ -99,6 +100,7 @@ def get_pages_data(url):
     add_quotes_to_list(page_quotes)
     next_page = check_for_next_page(site_page)
     if next_page == True:
+        sleep(2)
         return True
     return False
 
