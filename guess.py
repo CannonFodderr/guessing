@@ -7,20 +7,24 @@ DB = 'quotes.csv'
 URL = "http://quotes.toscrape.com"
 TITLE = "How said the quote?"
 
+
 def main():
     quotes = read_csv_file(DB)
     game_loop(quotes)
 
 # GAME FUNCTIONS
 
+
 def make_soup(site_page):
     """Parse the incoming html"""
     return BeautifulSoup(site_page, 'html.parser')
+
 
 def read_csv_file(db):
     with open(db, "r", encoding="utf-8") as csv_file:
         csv_reader = DictReader(csv_file)
         return list(csv_reader)
+
 
 def game_loop(quotes):
     """Start game once web scraping is done"""
@@ -94,5 +98,6 @@ def get_name_length(author):
     name_list = author.split(" ")
     last_name_length = f"Last name is {len(name_list[1])} charachters long"
     return last_name_length
+
 
 main()

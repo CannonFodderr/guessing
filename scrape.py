@@ -15,19 +15,19 @@ def main(url):
         print(f"Done scraping {url}")
         save_to_csv(ALL_QUOTES)
         print("CSV file saved")
-        # game_loop()
 
 
 # SCRAPING FUNCTIONS
 
 
 def save_to_csv(quotes):
-    with open('quotes.csv', "w",encoding="utf-8") as csv_file:
-        headers= ["quote", "author", "link"]
+    with open('quotes.csv', "w", encoding="utf-8") as csv_file:
+        headers = ["quote", "author", "link"]
         csv_writer = DictWriter(csv_file, fieldnames=headers)
         csv_writer.writeheader()
         for quote in ALL_QUOTES:
             csv_writer.writerow(quote)
+
 
 def get_pages_data(url):
     """Scrapes all pages for quotes, finish when there is no next_button"""
