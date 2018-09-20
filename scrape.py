@@ -7,13 +7,15 @@ from csv import DictWriter
 URL = "http://quotes.toscrape.com"
 
 
-def main(url):
+def main(url = URL):
     quotes_list = []
+    print("Downloading new quotes...")
     all_scraped_quotes = get_pages_data(url, quotes_list)
     print(
         f"Done scraping {url} got a {type(all_scraped_quotes).__name__} of a {len(all_scraped_quotes)} quotes")
     save_to_csv(all_scraped_quotes)
     print("CSV file saved")
+    return True
 
 
 # SCRAPING FUNCTIONS
@@ -61,5 +63,6 @@ def extract_quotes(soup):
         page_quotes.append(quote_data)
     return page_quotes
 
+if __name__ == "__main__":
+    main(URL)
 
-main(URL)

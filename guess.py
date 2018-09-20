@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from random import choice
+import scrape
 from csv import DictReader
+
 
 DB = 'quotes.csv'
 URL = "http://quotes.toscrape.com"
@@ -9,7 +11,7 @@ TITLE = "How said the quote?"
 
 
 def main():
-    quotes = read_csv_file(DB)
+    quotes = open_csv_file(DB)
     game_loop(quotes)
 
 # GAME FUNCTIONS
@@ -20,11 +22,19 @@ def make_soup(site_page):
     return BeautifulSoup(site_page, 'html.parser')
 
 
-def read_csv_file(db):
-    with open(db, "r", encoding="utf-8") as csv_file:
-        csv_reader = DictReader(csv_file)
-        return list(csv_reader)
+def open_csv_file(db):
+    """Open CSV file if it is NOT found run scraper.py"""
+    try:
+        return read_csv_content(db)
+    except FileNotFoundError:
+        scraper_done = scrape.main(URL)
+        if scraper_done:
+            return read_csv_content(db)
 
+def read_csv_content(db):
+    with open(db, "r", encoding="utf-8") as csv_file:
+            csv_reader = DictReader(csv_file)
+            return list(csv_reader)
 
 def game_loop(quotes):
     """Start game once web scraping is done"""
@@ -52,25 +62,24 @@ def pick_random_quote(quotes):
 
 def play_round(quote):
     """Play one round of guessing the author name"""
-    strikes = 2
+    strikes = 3
     quote_text = quote["quote"]
     author = quote["author"]
-    print(author)
     name_list = split_full_name(author)
     author_bio = get_author_bio(quote)
     initials = get_initials(name_list)
     last_name_length = last_name_length_hint(name_list)
-    hints = [last_name_length, initials, author_bio]
-    user_guess = input(f"{quote_text}: ").lower()
+    hints = [None, last_name_length, initials, author_bio]
+    print(quote_text)
     while strikes >= 0:
+        user_guess = input().lower()
         if user_guess == author.lower():
             print(f"{author} is Correct!")
             return True
-        elif user_guess != author.lower():
+        else: 
             print(f"No Sorry, Heres a hint: {hints[strikes]}")
-            user_guess = input(
-                f"Guess again, {strikes} strikes left: ").lower()
-        strikes -= 1
+            print(f"{strikes} strikes left")
+            strikes -= 1
     print(f"The correct answer was {author}")
     return False
 
