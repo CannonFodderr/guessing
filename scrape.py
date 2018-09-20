@@ -5,16 +5,14 @@ from time import sleep
 from csv import DictWriter
 
 URL = "http://quotes.toscrape.com"
-ALL_QUOTES = []
-PLAY_AGAIN = True
 
 
 def main(url):
-    done_scraping = get_pages_data(url)
-    if done_scraping:
-        print(f"Done scraping {url}")
-        save_to_csv(ALL_QUOTES)
-        print("CSV file saved")
+    quotes_list = []
+    all_scraped_quotes = get_pages_data(url, quotes_list)
+    print(f"Done scraping {url} got a {type(all_scraped_quotes).__name__} of a {len(all_scraped_quotes)} quotes")
+    save_to_csv(all_scraped_quotes)
+    print("CSV file saved")
 
 
 # SCRAPING FUNCTIONS
@@ -25,26 +23,24 @@ def save_to_csv(quotes):
         headers = ["quote", "author", "link"]
         csv_writer = DictWriter(csv_file, fieldnames=headers)
         csv_writer.writeheader()
-        for quote in ALL_QUOTES:
+        for quote in quotes:
             csv_writer.writerow(quote)
 
 
-def get_pages_data(url):
+def get_pages_data(url, quotes_list):
     """Scrapes all pages for quotes, finish when there is no next_button"""
     site_page = requests.get(url).content
-    page_quotes = extract_quotes(site_page)
-    add_quotes_to_list(page_quotes)
-    next_page = check_for_next_page(site_page)
-    if next_page == True:
+    soup = make_soup(site_page)
+    page_quotes = extract_quotes(soup)
+    quotes_list.extend(page_quotes)
+    next_button = soup.find(class_="next")
+    if next_button:
         # sleep(2)
-        return True
-    return False
-
-
-def add_quotes_to_list(page_quotes):
-    """Adding a single page quotes to main quotes list"""
-    for qoute in page_quotes:
-        ALL_QUOTES.append(qoute)
+        next_href = next_button.findChild("a")["href"]
+        next_url = URL + next_href
+        get_pages_data(next_url, quotes_list)
+    return quotes_list
+        
 
 
 def make_soup(site_page):
@@ -52,21 +48,9 @@ def make_soup(site_page):
     return BeautifulSoup(site_page, 'html.parser')
 
 
-def check_for_next_page(site_page):
-    """Check if next button exsists in page"""
-    soup = make_soup(site_page)
-    next_button = soup.find(class_="next")
-    if next_button:
-        next_href = next_button.findChild("a")["href"]
-        next_url = URL + next_href
-        get_pages_data(next_url)
-        return True
-    return False
 
-
-def extract_quotes(site_page):
+def extract_quotes(soup):
     """Grab all quotes from a single page and form a dictionary"""
-    soup = make_soup(site_page)
     quotes = soup.find_all(class_="quote")
     page_quotes = []
     for q in quotes:

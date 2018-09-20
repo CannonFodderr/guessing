@@ -30,11 +30,12 @@ def game_loop(quotes):
     """Start game once web scraping is done"""
     print_title()
     quote = pick_random_quote(quotes)
-    game_over = play_round(quote)
-    if game_over:
-        play_again = input("Play again (y/n)?").lower()
-        if play_again[0] == 'y':
-            game_loop(quotes)
+    player_won = play_round(quote)
+    print('Nice!' if player_won else 'Too bad')
+    play_again = input("Play again (y/n)?").lower()
+    if not play_again in ("yes", "y"):
+        return print("Bye Bye")
+    game_loop(quotes)
 
 
 def print_title():
@@ -46,8 +47,7 @@ def print_title():
 
 def pick_random_quote(quotes):
     """Select a random quote from scraped list"""
-    rand_quote = choice(quotes)
-    return rand_quote
+    return choice(quotes)
 
 
 def play_round(quote):
@@ -55,12 +55,14 @@ def play_round(quote):
     strikes = 2
     quote_text = quote["quote"]
     author = quote["author"]
+    print(author)
+    name_list = split_full_name(author)
     author_bio = get_author_bio(quote)
-    initials = get_initials(author)
-    first_name_length = get_name_length(author)
-    hints = [first_name_length, initials, author_bio]
-    user_guess = input(f"Who said/wrote: {quote_text} ? ").lower()
-    while True:
+    initials = get_initials(name_list)
+    last_name_length = last_name_length_hint(name_list)
+    hints = [last_name_length, initials, author_bio]
+    user_guess = input(f"{quote_text}: ").lower()
+    while strikes >= 0:
         if user_guess == author.lower():
             print(f"{author} is Correct!")
             return True
@@ -68,10 +70,10 @@ def play_round(quote):
             print(f"No Sorry, Heres a hint: {hints[strikes]}")
             user_guess = input(
                 f"Guess again, {strikes} strikes left: ").lower()
-        if strikes == 0:
-            print(f"The correct answer was {author}")
-            return True
         strikes -= 1
+    print(f"The correct answer was {author}")
+    return False
+        
 
 
 def get_author_bio(quote):
@@ -86,18 +88,17 @@ def get_author_bio(quote):
         return phrase
 
 
-def get_initials(author):
+def get_initials(name_list):
     """Return initials from the authors name"""
-    name_list = author.split(" ")
-    initials = f"His/Hers initials are: {name_list[0][0]}.{name_list[1][0]}."
-    return initials
+    return f"His/Hers initials are: {name_list[0][0]}.{name_list[1][0]}."
 
 
-def get_name_length(author):
+def last_name_length_hint(name_list):
     """Measure the length of the authors last name"""
-    name_list = author.split(" ")
-    last_name_length = f"Last name is {len(name_list[1])} charachters long"
-    return last_name_length
+    return f"Last name is {len(name_list[1])} charachters long"
 
+def split_full_name(full_name):
+    first_name, last_name = full_name.rsplit(" ", 1)
+    return [first_name, last_name]
 
 main()
