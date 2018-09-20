@@ -73,7 +73,6 @@ def play_round(quote):
         strikes -= 1
     print(f"The correct answer was {author}")
     return False
-        
 
 
 def get_author_bio(quote):
@@ -97,8 +96,10 @@ def last_name_length_hint(name_list):
     """Measure the length of the authors last name"""
     return f"Last name is {len(name_list[1])} charachters long"
 
+
 def split_full_name(full_name):
     first_name, last_name = full_name.rsplit(" ", 1)
     return [first_name, last_name]
+
 
 main()

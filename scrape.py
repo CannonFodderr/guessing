@@ -10,7 +10,8 @@ URL = "http://quotes.toscrape.com"
 def main(url):
     quotes_list = []
     all_scraped_quotes = get_pages_data(url, quotes_list)
-    print(f"Done scraping {url} got a {type(all_scraped_quotes).__name__} of a {len(all_scraped_quotes)} quotes")
+    print(
+        f"Done scraping {url} got a {type(all_scraped_quotes).__name__} of a {len(all_scraped_quotes)} quotes")
     save_to_csv(all_scraped_quotes)
     print("CSV file saved")
 
@@ -40,13 +41,11 @@ def get_pages_data(url, quotes_list):
         next_url = URL + next_href
         get_pages_data(next_url, quotes_list)
     return quotes_list
-        
 
 
 def make_soup(site_page):
     """Parse the incoming html"""
     return BeautifulSoup(site_page, 'html.parser')
-
 
 
 def extract_quotes(soup):
