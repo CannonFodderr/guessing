@@ -1,7 +1,9 @@
 import requests
+import scrape
+import os
+
 from bs4 import BeautifulSoup
 from random import choice
-import scrape
 from csv import DictReader
 
 
@@ -24,17 +26,18 @@ def make_soup(site_page):
 
 def open_csv_file(db):
     """Open CSV file if it is NOT found run scraper.py"""
-    try:
-        return read_csv_content(db)
-    except FileNotFoundError:
+    if not os.path.isfile(DB):
         scraper_done = scrape.main(URL)
         if scraper_done:
             return read_csv_content(db)
+    return read_csv_content(db)
+
 
 def read_csv_content(db):
     with open(db, "r", encoding="utf-8") as csv_file:
-            csv_reader = DictReader(csv_file)
-            return list(csv_reader)
+        csv_reader = DictReader(csv_file)
+        return list(csv_reader)
+
 
 def game_loop(quotes):
     """Start game once web scraping is done"""
@@ -65,21 +68,23 @@ def play_round(quote):
     strikes = 3
     quote_text = quote["quote"]
     author = quote["author"]
+    # print(author)
     name_list = split_full_name(author)
     author_bio = get_author_bio(quote)
     initials = get_initials(name_list)
     last_name_length = last_name_length_hint(name_list)
-    hints = [None, last_name_length, initials, author_bio]
+    hints = [last_name_length, initials, author_bio]
     print(quote_text)
     while strikes >= 0:
         user_guess = input().lower()
         if user_guess == author.lower():
             print(f"{author} is Correct!")
             return True
-        else: 
-            print(f"No Sorry, Heres a hint: {hints[strikes]}")
-            print(f"{strikes} strikes left")
-            strikes -= 1
+        else:
+            print(f"No Sorry, Heres a hint: {hints[strikes-1]}")
+            if strikes:
+                print(f"{strikes-1} strikes left")
+        strikes -= 1
     print(f"The correct answer was {author}")
     return False
 
