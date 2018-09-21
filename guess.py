@@ -81,10 +81,10 @@ def play_round(quote):
             print(f"{author} is Correct!")
             return True
         else:
-            print(f"No Sorry, Heres a hint: {hints[strikes-1]}")
             if strikes:
+                print(f"No Sorry, Heres a hint: {hints[strikes-1]}")
                 print(f"{strikes-1} strikes left")
-        strikes -= 1
+            strikes -= 1
     print(f"The correct answer was {author}")
     return False
 
