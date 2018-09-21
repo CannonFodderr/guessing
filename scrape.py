@@ -1,4 +1,5 @@
 import requests
+
 from bs4 import BeautifulSoup
 from random import choice
 from time import sleep
@@ -7,7 +8,7 @@ from csv import DictWriter
 URL = "http://quotes.toscrape.com"
 
 
-def main(url = URL):
+def main(url=URL):
     quotes_list = []
     print("Downloading new quotes...")
     all_scraped_quotes = get_pages_data(url, quotes_list)
@@ -63,6 +64,6 @@ def extract_quotes(soup):
         page_quotes.append(quote_data)
     return page_quotes
 
+
 if __name__ == "__main__":
     main(URL)
-
