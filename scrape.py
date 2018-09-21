@@ -9,14 +9,12 @@ URL = "http://quotes.toscrape.com"
 
 
 def main(url=URL):
-    quotes_list = []
     print("Downloading new quotes...")
-    all_scraped_quotes = get_pages_data(url, quotes_list)
+    all_scraped_quotes = get_pages_data(url)
     print(
         f"Done scraping {url} got a {type(all_scraped_quotes).__name__} of a {len(all_scraped_quotes)} quotes")
     save_to_csv(all_scraped_quotes)
     print("CSV file saved")
-    return True
 
 
 # SCRAPING FUNCTIONS
@@ -27,23 +25,22 @@ def save_to_csv(quotes):
         headers = ["quote", "author", "link"]
         csv_writer = DictWriter(csv_file, fieldnames=headers)
         csv_writer.writeheader()
-        for quote in quotes:
-            csv_writer.writerow(quote)
+        [csv_writer.writerow(quote) for quote in quotes]
+            
 
 
-def get_pages_data(url, quotes_list):
+def get_pages_data(url):
     """Scrapes all pages for quotes, finish when there is no next_button"""
     site_page = requests.get(url).content
     soup = make_soup(site_page)
     page_quotes = extract_quotes(soup)
-    quotes_list.extend(page_quotes)
     next_button = soup.find(class_="next")
     if next_button:
         # sleep(2)
         next_href = next_button.findChild("a")["href"]
         next_url = URL + next_href
-        get_pages_data(next_url, quotes_list)
-    return quotes_list
+        page_quotes.extend(get_pages_data(next_url))
+    return page_quotes
 
 
 def make_soup(site_page):

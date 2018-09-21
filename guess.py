@@ -27,9 +27,7 @@ def make_soup(site_page):
 def open_csv_file(db):
     """Open CSV file if it is NOT found run scraper.py"""
     if not os.path.isfile(DB):
-        scraper_done = scrape.main(URL)
-        if scraper_done:
-            return read_csv_content(db)
+        scrape.main(URL)
     return read_csv_content(db)
 
 
@@ -81,8 +79,9 @@ def play_round(quote):
             print(f"{author} is Correct!")
             return True
         else:
-            if strikes:
+            if hints:
                 print(f"No Sorry, Heres a hint: {hints[strikes-1]}")
+                hints.pop()
                 print(f"{strikes-1} strikes left")
             strikes -= 1
     print(f"The correct answer was {author}")
