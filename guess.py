@@ -63,27 +63,25 @@ def pick_random_quote(quotes):
 
 def play_round(quote):
     """Play one round of guessing the author name"""
-    strikes = 3
     quote_text = quote["quote"]
     author = quote["author"]
-    # print(author)
     name_list = split_full_name(author)
     author_bio = get_author_bio(quote)
     initials = get_initials(name_list)
     last_name_length = last_name_length_hint(name_list)
     hints = [last_name_length, initials, author_bio]
     print(quote_text)
-    while strikes >= 0:
+    strikes = 4
+    while strikes:
         user_guess = input().lower()
         if user_guess == author.lower():
             print(f"{author} is Correct!")
             return True
-        else:
-            if hints:
-                print(f"No Sorry, Heres a hint: {hints[strikes-1]}")
-                hints.pop()
-                print(f"{strikes-1} strikes left")
-            strikes -= 1
+        elif hints:
+            next_hint = hints.pop()
+            print(f"Heres a hint: {next_hint} \n{len(hints)} strikes left")
+            
+        strikes -= 1
     print(f"The correct answer was {author}")
     return False
 
